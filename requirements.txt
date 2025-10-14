@@ -1,0 +1,2 @@
+dlt[filesystem,sql-database]>=1.17.1
+psycopg2-binary>=2.9.0
