@@ -42,7 +42,7 @@ docker ps
 ```
 5.2. Copiar o backup para o container postgres:
 ````sh
-docker cp backup_postgres.dump <ID-CONTAINER-POSTGRES>:/tmp/
+docker cp dlt.dump <ID-CONTAINER-POSTGRES>:/tmp/
 ````
 
 5.3. Comando para reustaurar o banco de dados:
