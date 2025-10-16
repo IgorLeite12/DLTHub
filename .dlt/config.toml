@@ -7,4 +7,11 @@ dlthub_telemetry = true
 
 # Configuração do destino filesystem
 [destination.filesystem]
-bucket_url = "landing"  # Pasta local para armazenar os dados
+bucket_url = "s3://landing"
+
+# Desabilita compressão para garantir arquivos CSV não zipados
+[normalize.data_writer]
+disable_compression = true
+
+[loader.data_writer]
+disable_compression = true

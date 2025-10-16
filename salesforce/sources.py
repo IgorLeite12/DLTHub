@@ -1,40 +1,27 @@
-"""Source para PostgreSQL usando dlt.
-
-Este source extrai dados de tabelas PostgreSQL e carrega no destino configurado.
-"""
-
-from dlt.sources import DltResource
-from typing import Iterable, List
-
+from typing import Iterator, Dict, Any
 import dlt
-from dlt.common.typing import TDataItem
-
-from .records import get_records
+import datetime
 from .client import PostgresCredentials, make_postgres_client
-
+from .records import get_records
 
 @dlt.source(name="postgres")
 def postgres_source(
-        credentials: PostgresCredentials = dlt.secrets.value,
-        tables: List[str] = None,
-) -> Iterable[DltResource]:
-    """
-    Source dlt para extrair dados do PostgreSQL.
+    credentials: PostgresCredentials = dlt.secrets.value,
+):
+    # Cria a conexão com o banco de dados
+    conn = make_postgres_client(credentials)
+    
+    @dlt.resource(name="employee", write_disposition="replace")
+    def get_employee(
+         last_modified_at=dlt.sources.incremental("modified_at", initial_value=datetime.datetime(2000, 1, 1, 0, 0, 0))
+    ) -> Iterator[Dict[str, Any]]:
+        yield from get_records(conn, "employee", last_state=last_modified_at, limit=1000)
+    
 
-    Args:
-        credentials: Credenciais do PostgreSQL (obtidas automaticamente de .dlt/secrets.toml)
+    @dlt.resource(name="sale", write_disposition="replace")
+    def get_sale(
+         last_modified_at=dlt.sources.incremental("modified_at", initial_value=datetime.datetime(2000, 1, 1, 0, 0, 0))
+    ) -> Iterator[Dict[str, Any]]:
+        yield from get_records(conn, "sale", last_state=last_modified_at, limit=1000)
 
-    Returns:
-        Iterable de recursos dlt
-    """
-    client = make_postgres_client(credentials)
-
-    # Define recursos (tabelas) para extrair
-    @dlt.resource(write_disposition="replace")
-    def employee() -> Iterable[TDataItem]:
-        """Extrai dados da tabela employee"""
-        yield from get_records(client, "employee")
-
-    return (
-        employee,
-    )
+    return get_employee, get_sale

@@ -8,7 +8,6 @@ from dlt.common.configuration import with_config
 
 @configspec
 class PostgresCredentials(CredentialsConfiguration):
-    """Credenciais para conexão PostgreSQL - usar os do secret.toml"""
     
     database: str = "sale"
     username: str = "postgres"
@@ -25,15 +24,7 @@ class PostgresCredentials(CredentialsConfiguration):
 def make_postgres_client(
     credentials: PostgresCredentials = None,
 ) -> psycopg2.extensions.connection:
-    """
-    Cria uma conexão com o banco PostgreSQL usando as credenciais fornecidas.
-    
-    Args:
-        credentials: Credenciais do PostgreSQL (obtidas automaticamente do dlt)
-    
-    Returns:
-        Conexão psycopg2 com o banco de dados
-    """
+
     return psycopg2.connect(
         dbname=credentials.database,
         user=credentials.username,
